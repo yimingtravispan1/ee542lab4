@@ -23,7 +23,7 @@ Master:
 
 Worker:
 
-![](images/Master_spark_installed.png)
+![](images/Worker_spark_installed.png)
 
 ---
 
