@@ -427,7 +427,7 @@ The failed attempt was excluded from the performance comparison.
 
 ## 4. Setting up Spark on AWS EC2
 
-Apache Spark 3.5.1 was installed on the EC2 instance. The Spark environment variables were configured in `.bashrc`:
+Apache Spark 3.5.1 was installed on both EC2 instances. The Spark environment variables were configured in `.bashrc`:
 
 ```bash
 export SPARK_HOME=/opt/spark
@@ -441,6 +441,19 @@ spark-submit --version
 ```
 
 Spark started successfully with Java 11.
+
+For the one-node configuration, the Spark Master and one Spark Worker were started on the Master instance:
+
+```bash
+/opt/spark/sbin/start-master.sh
+/opt/spark/sbin/start-worker.sh spark://10.0.1.64:7077
+```
+
+For the two-node configuration, an additional Spark Worker was started on the Worker instance:
+
+```bash
+/opt/spark/sbin/start-worker.sh spark://10.0.1.64:7077
+```
 
 Master:
 
@@ -461,12 +474,12 @@ Three PySpark programs were implemented using the Gutenberg text files.
 `spark_wordcount.py` counts the frequency of each word using `flatMap`, `map`, and `reduceByKey`.
 
 ```bash
-spark-submit spark_wordcount.py
+/usr/bin/time -p spark-submit --master spark://10.0.1.64:7077 spark_wordcount.py
 ```
 
 The program successfully processed the input files and generated the word-count output.
 
-**Execution time:** 2.33 s
+**Execution time:** 13.74 s
 
 ![](images/Word_Count_Time.png)
 
@@ -475,12 +488,12 @@ The program successfully processed the input files and generated the word-count 
 `spark_charcount.py` counts the frequency of each character in the Gutenberg dataset.
 
 ```bash
-spark-submit spark_charcount.py
+/usr/bin/time -p spark-submit --master spark://10.0.1.64:7077 spark_charcount.py
 ```
 
 The output contains each character and its total frequency.
 
-**Execution time:** 2.64 s
+**Execution time:** 13.41 s
 
 ![](images/Character_Count_Time.png)
 
@@ -489,7 +502,7 @@ The output contains each character and its total frequency.
 `spark_minmax.py` calculates the least and most frequently occurring words.
 
 ```bash
-spark-submit spark_minmax.py
+/usr/bin/time -p spark-submit --master spark://10.0.1.64:7077 spark_minmax.py
 ```
 
 Result:
@@ -501,11 +514,9 @@ MAX: ('the', 8577)
 
 ![](images/Min_and_Max_Results.png)
 
-**Execution time:** 2.075938 + 0.291528 ≈ 2.37 s
+**Execution time:** 12.80 s
 
-![](images/Min_Time.png)
-
-![](images/Max_Time.png)
+![](images/Min_and_Max_Time.png)
 
 ## 6. Performance Comparison
 
@@ -515,9 +526,9 @@ Hadoop and Spark were tested on both one-node and two-node configurations using 
 
 | Task               | Hadoop 1 Node | Hadoop 2 Nodes | Spark 1 Node | Spark 2 Nodes |
 | ------------------ | ------------: | -------------: | -----------: | ------------: |
-| Word Count         |         ___ s |          ___ s |        2.33 s |         4.85 s |
-| Character Count    |         ___ s |          ___ s |        2.64 s |         4.65 s |
-| Min/Max Word Count |         ___ s |          ___ s |        2.37 s |         4.94 s |
+| Word Count         |       30.22 s |        33.45 s |        13.74 s |        12.80 s |
+| Character Count    |       29.27 s |        28.71 s |        13.41 s |        13.10 s |
+| Min/Max Word Count |       24.49 s |        24.97 s |        12.80 s |        12.70 s |
 
 ### 6.2 Discussion
 
