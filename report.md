@@ -1,7 +1,16 @@
 # EE 542 - Lab4
-# Part 1 — AWS Environment and Hadoop Setup
 
-## 1.1 AWS EC2 Configuration
+## Team Contributions
+
+| Member | Contributions |
+|---|---|
+| Paralyz3dz | Prepared the Hadoop setup and MapReduce report sections, implemented the Hadoop Streaming mapper and reducer programs, and added project screenshots. |
+| yxia | Implemented the PySpark analysis jobs and prepared the Spark report sections, screenshots, and performance results. |
+| yimingtravispan1 | Created the initial repository and added the final Hadoop and Spark performance comparison results to the report. |
+
+## Part 1 — AWS Environment and Hadoop Setup
+
+### 1.1 AWS EC2 Configuration
 
 Two AWS EC2 instances were created to build a Hadoop cluster.
 
@@ -21,7 +30,7 @@ A dedicated security group, `EE542-Lab4-Hadoop-SG`, was configured to allow SSH 
 
 The private network connection was verified using `ping` in both directions.
 
-## 1.2 Java and Hadoop Installation
+### 1.2 Java and Hadoop Installation
 
 Java 11, SSH, and rsync were installed on both instances:
 
@@ -59,7 +68,7 @@ hadoop version
 
 Both nodes successfully ran Hadoop 3.3.6 with Java 11.
 
-## 1.3 Hadoop Configuration
+### 1.3 Hadoop Configuration
 
 The Hadoop configuration files were updated:
 
@@ -117,9 +126,9 @@ Node State: RUNNING
 
 ---
 
-# Part 2 — Python MapReduce and Single-Node Evaluation
+## Part 2 — Python MapReduce and Single-Node Evaluation
 
-## 2.1 Gutenberg Dataset
+### 2.1 Gutenberg Dataset
 
 Two books from Project Gutenberg were downloaded and used as the experimental dataset.
 
@@ -146,7 +155,7 @@ The HDFS input directory was:
 
 The same dataset was retained throughout the single-node and two-node experiments.
 
-## 2.2 Python MapReduce Implementation
+### 2.2 Python MapReduce Implementation
 
 Three Python MapReduce tasks were implemented using Hadoop Streaming.
 
@@ -156,7 +165,7 @@ Three Python MapReduce tasks were implemented using Hadoop Streaming.
 | Min/Max Word Count | `minmax_reducer.py` | Find the minimum and maximum word frequencies |
 | Character Count | `char_mapper.py`, `char_reducer.py` | Count individual character frequencies |
 
-### Word Count
+#### Word Count
 
 The mapper reads each line and emits a key-value pair for each word:
 
@@ -168,7 +177,7 @@ The reducer aggregates all values associated with each word.
 
 The implementation uses whitespace-based tokenization, so punctuation and capitalization are preserved.
 
-### Min/Max Word Count
+#### Min/Max Word Count
 
 Min/Max was implemented as a second MapReduce stage.
 
@@ -191,7 +200,7 @@ Aggregated Word Frequencies
 
 The reported Min/Max execution time includes only the second stage, not the preceding Word Count job.
 
-### Character Count
+#### Character Count
 
 A new Python mapper and reducer were implemented to count individual characters.
 
@@ -207,7 +216,7 @@ U+0061    a
 
 The implementation distinguishes uppercase and lowercase characters and excludes line-ending characters.
 
-## 2.3 Single-Node Performance Results
+### 2.3 Single-Node Performance Results
 
 All three tasks were successfully executed on the Master-only Hadoop configuration.
 
@@ -225,7 +234,7 @@ Execution time was measured using:
 
 The `real` value was recorded as the total elapsed time.
 
-### Word Count Results
+#### Word Count Results
 
 The Word Count job processed 22,656 input lines and generated 21,419 output records.
 
@@ -235,7 +244,7 @@ The output was saved to:
 /output_wordcount_1node
 ```
 
-### Min/Max Results
+#### Min/Max Results
 
 | Result | Word | Frequency |
 |---|---|---:|
@@ -250,7 +259,7 @@ Output directory:
 
 Multiple words may share the minimum frequency. The reducer retains the first minimum encountered.
 
-### Character Count Results
+#### Character Count Results
 
 The Character Count task produced frequency records for 101 distinct characters.
 
@@ -274,9 +283,9 @@ The results demonstrate that the program counts spaces and punctuation in additi
 
 ---
 
-# Part 3 — Two-Node Hadoop Scaling and Performance Evaluation
+## Part 3 — Two-Node Hadoop Scaling and Performance Evaluation
 
-## 3.1 Expanding Hadoop to Two Nodes
+### 3.1 Expanding Hadoop to Two Nodes
 
 After completing the single-node baseline, the Worker was added to the existing Hadoop cluster.
 
@@ -303,7 +312,7 @@ HDFS and YARN were restarted without reformatting the existing NameNode.
 
 The existing Gutenberg dataset and single-node results were preserved.
 
-## 3.2 Two-Node Cluster Verification
+### 3.2 Two-Node Cluster Verification
 
 HDFS successfully recognized both DataNodes:
 
@@ -327,7 +336,7 @@ This confirmed that both nodes had joined the HDFS and YARN cluster.
 
 The registration checks establish that both nodes were available to the cluster. Per-task placement records were not obtained, so they do not independently prove that every job used both nodes for computation.
 
-## 3.3 Two-Node MapReduce Experiments
+### 3.3 Two-Node MapReduce Experiments
 
 The three MapReduce tasks were rerun using the same Gutenberg dataset, Python programs, and reducer settings.
 
@@ -347,9 +356,9 @@ No differences were reported.
 
 The Min/Max results were also identical across the two configurations.
 
-## 3.4 Performance Comparison
+### 3.4 Performance Comparison
 
-### Hadoop MapReduce: Single Node vs Two Nodes
+#### Hadoop MapReduce: Single Node vs Two Nodes
 
 | MapReduce Task | Single Node (s) | Two Nodes (s) | Difference (s) |
 |---|---:|---:|---:|
@@ -365,7 +374,7 @@ The Min/Max results were also identical across the two configurations.
 - Each value represents one successful run under the corresponding configuration.
 - The dataset and Python implementations remained unchanged.
 
-### Observations
+#### Observations
 
 Word Count took 30.22 seconds on one node and 33.45 seconds on two nodes.
 
@@ -381,11 +390,11 @@ Additional repeated runs and task-placement verification would be useful before 
 
 ---
 
-## 3.5 Troubleshooting
+### 3.5 Troubleshooting
 
 Two main issues were encountered while configuring and testing the two-node cluster.
 
-### Issue 1 — Worker DataNode Registration Failure
+#### Issue 1 — Worker DataNode Registration Failure
 
 Initially, the Worker DataNode process started but did not successfully register with the NameNode.
 
@@ -400,7 +409,7 @@ The problem was addressed by configuring hostname resolution for the Worker on t
 
 After restarting HDFS, both DataNodes were successfully recognized.
 
-### Issue 2 — MapReduce Container Launch Failure
+#### Issue 2 — MapReduce Container Launch Failure
 
 The first two-node Character Count attempt failed with:
 
