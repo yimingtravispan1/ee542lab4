@@ -534,7 +534,11 @@ Hadoop and Spark were tested on both one-node and two-node configurations using 
 
 **1. Which framework executed faster on one node? On two nodes?**
 
-[Insert answer based on measured execution times.]
+Spark executed faster than Hadoop for all three tasks in both configurations. On one node, Spark reduced the average execution time from 27.99 seconds to 13.32 seconds, an improvement of approximately 52.4%. On two nodes, the average execution time decreased from 29.04 seconds with Hadoop to 12.87 seconds with Spark, an improvement of approximately 55.7%.
+
+Adding a second node did not consistently improve Hadoop performance: Word Count and Min/Max became slightly slower, while Character Count improved by only 0.56 seconds. Spark showed small improvements on two nodes, with Word Count decreasing from 13.74 to 12.80 seconds, Character Count from 13.41 to 13.10 seconds, and Min/Max from 12.80 to 12.70 seconds.
+
+The limited scaling benefit is likely caused by the small 1.2 MB dataset. For such a small workload, scheduling, startup, data transfer, and cluster communication overhead can outweigh the benefit of distributing the computation.
 
 **2. Which framework is easier to implement in Python?**
 
